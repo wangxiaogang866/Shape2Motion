@@ -1,0 +1,50 @@
+function test_stage_3
+FindFiles = 'test_data_stage_3/';
+Files = dir(fullfile(FindFiles,'*.mat'));
+filenames = {Files.name}';
+for i = 1:size(filenames,1)
+    temp_name = filenames{i};
+    load_path_1 = [FindFiles temp_name];
+    load(load_path_1)
+    temp_name = temp_name(20:end-4);
+    load_path_2 = ['test_s_3_pred_' temp_name '.mat'];
+    load(load_path_2);
+    a = size(Training_data,1);
+    pred_dof_regression = mat2cell(pred_dof_regression,ones(a,1));
+    pred_proposal = mat2cell(pred_proposal,ones(a,1));
+    cellfun(@(x,y,z) solve(x,y,z),Training_data(1:10),pred_dof_regression(1:10),pred_proposal(1:10),'Unif',0);
+end
+
+
+end
+
+function solve(x,y,z)
+GT_proposal = x.proposal;
+s2_proposal = x.s2_proposal;
+z = reshape(z,4096,2);
+[a,b] = max(z,[],2);
+b=b-1;
+
+inter = GT_proposal.*s2_proposal;
+union = logical(GT_proposal+s2_proposal);
+iou_before = sum(inter)/sum(union)
+
+inter = GT_proposal.*b';
+union = logical(GT_proposal+b');
+iou_after = sum(inter)/sum(union)
+
+
+figure(1)
+input = x.inputs_all(:,1:3)
+input(s2_proposal==0,:) = [];
+plot3(input(:,1),input(:,2),input(:,3),'o');
+axis equal;
+
+figure(2)
+input = x.inputs_all(:,1:3)
+input(b==0,:) = [];
+plot3(input(:,1),input(:,2),input(:,3),'o');
+axis equal;
+close(figure(1));
+close(figure(2));
+end
