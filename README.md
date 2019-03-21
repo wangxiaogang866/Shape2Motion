@@ -52,11 +52,11 @@ You can download the data [here](http://www.zbuaa.com/sa2018/data.rar).
 If you find our paper useful in your research, please cite:
 
  @article{wang_siga18,\
-   title = {Learning to Group and Label Fine-Grained Shape Components},\
-   author = {Xiaogang Wang and Bin Zhou and Haiyue Fang and Xiaowu Chen and Qinping Zhao and Kai Xu},\
-   journal = {ACM Transactions on Graphics (SIGGRAPH Asia 2018)},\
-   volume = {37},\
-   number = {6},\
+   title = {Shape2Motion: Joint Analysis of Motion Parts and Attributes from 3D Shapes},\
+   author = {Xiaogang Wang and Bin Zhou and Yahao Shi and Xiaowu Chen and Qinping Zhao and Kai Xu},\
+   journal = {IEEE Conference on Computer Vision and Pattern},\
+   volume = {XX},\
+   number = {XX},\
    pages = {to appear},\
-   year = {2018}\
+   year = {2019}\
   }
