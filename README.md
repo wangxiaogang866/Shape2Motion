@@ -1,12 +1,20 @@
-# Shape2Motion
+# Shape2Motion: Joint Analysis of Motion Parts and Attributes from 3D Shapes
 
-Requirements：
+This is the code repository for "Shape2Motion: Joint Analysis of Motion Parts and Attributes from 3D Shapes”
+
+Created by Xiaogang Wang, Bin Zhou, Yahao Shi, Xiaowu Chen, Qinping Zhao, Kai Xu
+
+
+## Prerequisites: 
     Numpy (ver. 1.13.3)
     TensorFlow (ver. 1.4.1)
     scipy (ver. 0.19.1)
+     
+## Dataset 
+You can download the data [here](http://www.zbuaa.com/sa2018/data.rar).
 
-Usage：
-Train：
+
+## Train：
 
     to train Motion Part Proposal Module and Motion Attribute Proposal Module
 
@@ -20,7 +28,7 @@ Train：
 
     python train_stage_3
 
-Test：
+## Test：
 
     to test Motion Part Proposal Module and Motion Attribute Proposal Module
 
@@ -34,7 +42,21 @@ Test：
 
     python test_stage_3
 
-Other:
+## Other:
     nms.m: This file is used for merging proposal.
     generate_stage_2_train_data.m: This file is used for generating stage 2 training_data.
     generate_stage_3_train_data.m: This file is used for generating stage 3 training_data.
+
+## Citation
+
+If you find our paper useful in your research, please cite:
+
+ @article{wang_siga18,\
+   title = {Learning to Group and Label Fine-Grained Shape Components},\
+   author = {Xiaogang Wang and Bin Zhou and Haiyue Fang and Xiaowu Chen and Qinping Zhao and Kai Xu},\
+   journal = {ACM Transactions on Graphics (SIGGRAPH Asia 2018)},\
+   volume = {37},\
+   number = {6},\
+   pages = {to appear},\
+   year = {2018}\
+  }
