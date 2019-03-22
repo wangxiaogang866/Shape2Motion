@@ -11,7 +11,7 @@ Created by Xiaogang Wang, Bin Zhou, Yahao Shi, Xiaowu Chen, Qinping Zhao, Kai Xu
     scipy (ver. 0.19.1)
      
 ## Dataset 
-You can download the data [here](http://www.zbuaa.com/sa2018/data.rar).
+You can download the data [here](http://www.zbuaa.com/CVPR19/dataset.zip).
 
 
 ## Train：
