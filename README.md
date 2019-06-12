@@ -11,7 +11,9 @@ Created by Xiaogang Wang, Bin Zhou, Yahao Shi, Xiaowu Chen, Qinping Zhao, Kai Xu
     scipy (ver. 0.19.1)
      
 ## Dataset 
-You can download the data [here](http://www.zbuaa.com/CVPR19/dataset.zip).
+[June 13, 2019] We release our 3D object mobility dataset 'Motion Dataset' [here]. (http://motiondataset.zbuaa.com/)
+
+You can download the data (point cloud data) [here](http://www.zbuaa.com/CVPR19/dataset.zip) for training and testing.
 
 
 ## Train：
