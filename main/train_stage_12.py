@@ -19,7 +19,7 @@ import provider
 import tf_util
 import scipy.io as sio
 parser = argparse.ArgumentParser()
-parser.add_argument('--gpu', type=int, default=3, help='GPU to use [default: GPU 0]')
+parser.add_argument('--gpu', type=int, default=2, help='GPU to use [default: GPU 0]')
 parser.add_argument('--model', default='model', help='Model name [default: model]')
 parser.add_argument('--stage_1_log_dir', default='stage_1_log', help='Log dir [default: log]')
 parser.add_argument('--stage_2_log_dir', default='stage_2_log', help='Log dir [default: log]')
@@ -147,55 +147,35 @@ def train():
                 train_op = optimizer.minimize(loss, global_step=batch_stage_1)
             
                 # Add ops to save and restore all the variables.
-                saver = tf.train.Saver(max_to_keep=100)
+                saver = tf.train.Saver(max_to_keep=10)
             elif STAGE==2:
                 print('stage_2')
                 pointclouds_pl,proposal_nx_pl,dof_mask_pl,dof_score_pl= MODEL.placeholder_inputs_stage_2(BATCH_SIZE,NUM_POINT)
+                is_training_feature= False
                 is_training_pl = tf.placeholder(tf.bool, shape=())
                 # Note the global_step=batch parameter to minimize. 
                 # That tells the optimizer to helpfully increment the 'batch' parameter for you every time it trains.
-                batch_stage_2_1 = tf.Variable(360000,name='stage2/batch_1')
-                batch_stage_2_2 = tf.Variable(0,name='stage2/batch_2')
-                bn_decay = get_bn_decay(batch_stage_2_1)
+                batch_stage_2 = tf.Variable(0,name='stage2/batch_2')
+                bn_decay = get_bn_decay(batch_stage_2)
                 tf.summary.scalar('bn_decay', bn_decay)
                 print "--- Get model and loss"
                 # Get model and loss 
-                end_points,dof_feat,simmat_feat = MODEL.get_feature(pointclouds_pl, is_training_pl,STAGE,bn_decay=bn_decay)
-                pred_dof_score = MODEL.get_stage_2(dof_feat,simmat_feat,dof_mask_pl,proposal_nx_pl,is_training_pl)
+                end_points,dof_feat,simmat_feat = MODEL.get_feature(pointclouds_pl, is_training_feature,STAGE,bn_decay=bn_decay)
+                pred_dof_score,all_feat = MODEL.get_stage_2(dof_feat,simmat_feat,dof_mask_pl,proposal_nx_pl,is_training_pl,bn_decay=bn_decay)
                 loss = MODEL.get_stage_2_loss(pred_dof_score,dof_score_pl,dof_mask_pl)
                 tf.summary.scalar('loss', loss)
-
                 print "--- Get training operator"
                 # Get training operator
-                learning_rate1 = get_learning_rate_stage_2(batch_stage_2_1,0.00001)
-                learning_rate2 = get_learning_rate_stage_2(batch_stage_2_2,0.0005)
-                tf.summary.scalar('learning_rate1', learning_rate1)
-                tf.summary.scalar('learning_rate2', learning_rate2)
+                learning_rate = get_learning_rate(batch_stage_2)
+                tf.summary.scalar('learning_rate', learning_rate)
                 variables = tf.contrib.framework.get_variables_to_restore()
-                print "variables"
-                for v in variables:
-                    print v
-                print "-------------------------"
                 variables_to_resotre = [v for v in variables if v.name.split('/')[0]=='pointnet']
-                print "variables_to_resotre"
-                for v in variables_to_resotre:
-                    print v
-                print "-------------------------"
                 variables_to_train = [v for v in variables if v.name.split('/')[0]=='stage2']
-                print "variables_to_train"
-                for v in variables_to_train:
-                    print v
-                print "-------------------------"
                 if OPTIMIZER == 'momentum':
                     optimizer = tf.train.MomentumOptimizer(learning_rate, momentum=MOMENTUM)
                 elif OPTIMIZER == 'adam':
-                    optimizer1 = tf.train.AdamOptimizer(learning_rate1)
-                    optimizer2 = tf.train.AdamOptimizer(learning_rate2)
-                train_op1 = optimizer1.minimize(loss,global_step=batch_stage_2_1,var_list=variables_to_resotre) 
-                train_op2 = optimizer2.minimize(loss,global_step=batch_stage_2_2,var_list=variables_to_train) 
-                #train_op = tf.group(train_op1, train_op2)
-                train_op = optimizer2.minimize(loss, global_step=batch_stage_2_2,var_list = variables_to_train)
-                #train_op = optimizer.minimize(loss, global_step=batch)
+                    optimizer = tf.train.AdamOptimizer(learning_rate)
+                train_op = optimizer.minimize(loss, global_step=batch_stage_2,var_list = variables_to_train)
                 # Add ops to save and restore all the variables.
                 saver = tf.train.Saver(var_list = variables_to_resotre)
                 saver2 = tf.train.Saver(max_to_keep=100)
@@ -209,8 +189,8 @@ def train():
         merged = tf.summary.merge_all()
         train_writer = tf.summary.FileWriter(os.path.join(LOG_DIR, 'train'), sess.graph)
         test_writer = tf.summary.FileWriter(os.path.join(LOG_DIR, 'test'), sess.graph)
-
-
+        
+        
         # Init variables
         if STAGE == 1:
             init = tf.global_variables_initializer()
@@ -271,8 +251,8 @@ def train():
                'loss': loss,
                'train_op': train_op,
                'merged': merged,
-               'step': batch_stage_2_2,
-               #'all_feat':all_feat,
+               'step': batch_stage_2,
+               'all_feat':all_feat,
                'end_points': end_points}
             for epoch in range(MAX_EPOCH):
                 log_string('**** TRAIN EPOCH %03d ****' % (epoch))
@@ -287,8 +267,8 @@ def train():
 
 def train_one_epoch_stage_1(sess, ops, train_writer):
     is_training = True
-    permutation = np.random.permutation(37)
-    for i in range(37/4):
+    permutation = np.random.permutation(5)
+    for i in range(len(permutation)/4):
         load_data_start_time = time.time();
         loadpath = './train_data/training_data_'+str(permutation[i*4]+1)+'.mat'
         train_data = sio.loadmat(loadpath)['Training_data']
@@ -406,9 +386,8 @@ def train_one_epoch_stage_1(sess, ops, train_writer):
 
 def train_one_epoch_stage_2(sess, ops, train_writer):
     is_training = True
-    permutation = np.random.permutation(4)
-    permutation = [3,3,3,3]
-    for i in range(4/4):
+    permutation = np.random.permutation(328)
+    for i in range(len(permutation)/4):
         load_data_start_time = time.time();
         loadpath = './train_data_stage_2/train_stage_2_data_'+str(permutation[i*4]+1)+'.mat'
         train_data = sio.loadmat(loadpath)['Training_data']
@@ -422,11 +401,13 @@ def train_one_epoch_stage_2(sess, ops, train_writer):
             log_string('\t%s: %s load time: %f' % (datetime.now(),temp_loadpath,temp_load_data_duration))
             train_data = np.concatenate((train_data,temp_train_data),axis = 0)
             print(train_data.shape)
+        
         num_data = train_data.shape[0]
         num_batch = num_data // BATCH_SIZE
         total_loss = 0.0
         process_start_time = time.time()
         np.random.shuffle(train_data)
+        
         for j in range(num_batch):
             begin_idx = j*BATCH_SIZE
             end_idx = (j+1)*BATCH_SIZE

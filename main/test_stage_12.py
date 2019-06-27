@@ -151,41 +151,45 @@ def train():
             elif STAGE==2:
                 print('stage_2')
                 pointclouds_pl,proposal_nx_pl,dof_mask_pl,dof_score_pl= MODEL.placeholder_inputs_stage_2(BATCH_SIZE,NUM_POINT)
+
+                is_training_feature= False
                 is_training_pl = tf.placeholder(tf.bool, shape=())
                 # Note the global_step=batch parameter to minimize. 
                 # That tells the optimizer to helpfully increment the 'batch' parameter for you every time it trains.
-                batch_stage_2_1 = tf.Variable(362824,name='stage2/batch_1')
-                batch_stage_2_2 = tf.Variable(0,name='stage2/batch_2')
-                bn_decay = get_bn_decay(batch_stage_2_1)
+                batch_stage_2 = tf.Variable(0,name='stage2/batch_2')
+                bn_decay = get_bn_decay(batch_stage_2)
                 tf.summary.scalar('bn_decay', bn_decay)
                 print "--- Get model and loss"
                 # Get model and loss 
-                end_points,dof_feat,simmat_feat = MODEL.get_feature(pointclouds_pl, is_training_pl,STAGE,bn_decay=bn_decay)
-                pred_dof_score = MODEL.get_stage_2(dof_feat,simmat_feat,dof_mask_pl,proposal_nx_pl,is_training_pl)
+                end_points,dof_feat,simmat_feat = MODEL.get_feature(pointclouds_pl, is_training_feature,STAGE,bn_decay=bn_decay)
+                pred_dof_score,all_feat = MODEL.get_stage_2(dof_feat,simmat_feat,dof_mask_pl,proposal_nx_pl,is_training_pl,bn_decay=bn_decay)
                 loss = MODEL.get_stage_2_loss(pred_dof_score,dof_score_pl,dof_mask_pl)
                 tf.summary.scalar('loss', loss)
 
                 print "--- Get training operator"
                 # Get training operator
-                learning_rate1 = get_learning_rate_stage_2(batch_stage_2_1,0.001)
-                learning_rate2 = get_learning_rate_stage_2(batch_stage_2_2,0.001)
-                tf.summary.scalar('learning_rate1', learning_rate1)
-                tf.summary.scalar('learning_rate2', learning_rate2)
+                learning_rate = get_learning_rate(batch_stage_2)
+                tf.summary.scalar('learning_rate', learning_rate)
                 variables = tf.contrib.framework.get_variables_to_restore()
+                print "variables"
+                for v in variables:
+                    print v
+                print "-------------------------"
                 variables_to_resotre = [v for v in variables if v.name.split('/')[0]=='pointnet']
+                print "variables_to_resotre"
+                for v in variables_to_resotre:
+                    print v
+                print "-------------------------"
                 variables_to_train = [v for v in variables if v.name.split('/')[0]=='stage2']
+                print "variables_to_train"
+                for v in variables_to_train:
+                    print v
+                print "-------------------------"
                 if OPTIMIZER == 'momentum':
                     optimizer = tf.train.MomentumOptimizer(learning_rate, momentum=MOMENTUM)
                 elif OPTIMIZER == 'adam':
-                    optimizer1 = tf.train.AdamOptimizer(learning_rate1)
-                    optimizer2 = tf.train.AdamOptimizer(learning_rate2)
-                train_op1 = optimizer1.minimize(loss,global_step=batch_stage_2_1,var_list=variables_to_resotre) 
-                train_op2 = optimizer2.minimize(loss,global_step=batch_stage_2_2,var_list=variables_to_train) 
-                train_op = tf.group(train_op1, train_op2)
-                #train_op = optimizer.minimize(loss, global_step=batch,var_list = variables_to_train)
-                #train_op = optimizer.minimize(loss, global_step=batch)
-                # Add ops to save and restore all the variables.
-                
+                    optimizer = tf.train.AdamOptimizer(learning_rate)
+                train_op = optimizer.minimize(loss, global_step=batch_stage_2,var_list = variables_to_train)                
                 # Add ops to save and restore all the variables.
                 saver = tf.train.Saver(max_to_keep=100)
                 
@@ -201,7 +205,7 @@ def train():
         test_writer = tf.summary.FileWriter(os.path.join(LOG_DIR, 'test'), sess.graph)
 
         # Init variables
-        model_path = './'+LOG_DIR + '/model50.ckpt'
+        model_path = './'+LOG_DIR + '/model100.ckpt'
         if STAGE == 1:
             #init = tf.global_variables_initializer()
             #sess.run(init)
@@ -257,7 +261,8 @@ def train():
                'loss': loss,
                'train_op': train_op,
                'merged': merged,
-               'step': batch_stage_2_2,
+               'step': batch_stage_2,
+               'all_feat':all_feat,
                'end_points': end_points}
             for epoch in range(MAX_EPOCH):
                 log_string('**** TEST EPOCH %03d ****' % (epoch))
@@ -268,8 +273,25 @@ def train():
 
 def eval_one_epoch_stage_1(sess, ops, train_writer):
     is_training = True
-    #dataset = ['./test_data/test_data_bike_1.mat','./test_data/test_data_car_1.mat',
-    #           './test_data/test_data_chair_1.mat','./test_data/test_data_motor_1.mat']
+    dataset = ['./train_data/training_data_1.mat','./train_data/training_data_2.mat',
+               './train_data/training_data_3.mat','./train_data/training_data_4.mat',
+               './train_data/training_data_5.mat','./train_data/training_data_6.mat',
+               './train_data/training_data_7.mat','./train_data/training_data_8.mat',
+               './train_data/training_data_9.mat','./train_data/training_data_10.mat',
+               './train_data/training_data_11.mat','./train_data/training_data_12.mat',
+               './train_data/training_data_13.mat','./train_data/training_data_14.mat',
+               './train_data/training_data_15.mat','./train_data/training_data_16.mat',
+               './train_data/training_data_17.mat','./train_data/training_data_18.mat',
+               './train_data/training_data_19.mat','./train_data/training_data_20.mat',
+               './train_data/training_data_21.mat','./train_data/training_data_22.mat',
+               './train_data/training_data_23.mat','./train_data/training_data_24.mat',
+               './train_data/training_data_25.mat','./train_data/training_data_26.mat',
+               './train_data/training_data_27.mat','./train_data/training_data_28.mat',
+               './train_data/training_data_29.mat','./train_data/training_data_30.mat',
+               './train_data/training_data_31.mat','./train_data/training_data_32.mat',
+               './train_data/training_data_33.mat','./train_data/training_data_34.mat',
+               './train_data/training_data_35.mat','./train_data/training_data_36.mat',
+               './train_data/training_data_37.mat']
     for i in range(len(dataset)):
         load_data_start_time = time.time();
         train_data = sio.loadmat(dataset[i])['Training_data']
@@ -409,9 +431,11 @@ def eval_one_epoch_stage_2(sess, ops, train_writer):
         log_string('\t%s: %s load time: %f' % (datetime.now(),loadpath,load_data_duration))
         num_data = train_data.shape[0]
         num_batch = num_data // BATCH_SIZE
+        print(num_data)
         total_loss = 0.0
         process_start_time = time.time()
-        pred_dof_score_val = np.zeros((num_data,NUM_POINT), np.float32)
+        pred_dof_score_val = np.zeros((num_data,NUM_POINT,1), np.float32)
+        all_feat= np.zeros((num_data,4096,256),np.float32)
         for j in range(num_batch):
             begin_idx = j*BATCH_SIZE
             end_idx = (j+1)*BATCH_SIZE
@@ -432,8 +456,8 @@ def eval_one_epoch_stage_2(sess, ops, train_writer):
                          ops['dof_score_pl']: batch_dof_score,
                          ops['is_training_pl']: is_training}
                     
-            summary, step, loss_val,pred_dof_score_val[begin_idx:end_idx,:]= sess.run([ops['merged'], ops['step'], \
-                                 ops['loss'],ops['pred_dof_score']],feed_dict=feed_dict)
+            summary, step, loss_val,pred_dof_score_val[begin_idx:end_idx,:],all_feat[begin_idx:end_idx,:,:]= sess.run([ops['merged'], ops['step'], \
+                                 ops['loss'],ops['pred_dof_score'],ops['all_feat']],feed_dict=feed_dict)
             train_writer.add_summary(summary, step)
             total_loss += loss_val
             #print('loss: %f' % loss_val)
@@ -445,7 +469,7 @@ def eval_one_epoch_stage_2(sess, ops, train_writer):
            % (datetime.now(),step,total_loss,process_duration,examples_per_sec,sec_per_batch))
         temp_name = dataset[i]
         temp_name = temp_name[34:-4]
-        sio.savemat('test_s_2_pred_'+temp_name, {'pred_dof_score_val': pred_dof_score_val})
+        sio.savemat('test_s_2_pred_'+temp_name, {'pred_dof_score_val': pred_dof_score_val,'all_feat':all_feat})
 
 
 if __name__ == "__main__":
