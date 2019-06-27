@@ -48,6 +48,9 @@ You can download the data (point cloud data) [here](http://www.zbuaa.com/CVPR19/
     nms.m: This file is used for merging proposal.
     generate_stage_2_train_data.m: This file is used for generating stage 2 training_data.
     generate_stage_3_train_data.m: This file is used for generating stage 3 training_data.
+    
+## Evaluation:
+    evaluation.m: This file is used for part mobility metrics.
 
 ## Citation
 
