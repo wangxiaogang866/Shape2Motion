@@ -180,7 +180,7 @@ def get_stage_2(dof_feat,simmat_feat,dof_mask_pl,proposal_nx_pl,is_training,bn_d
     pred_dof_score = tf_util.conv1d(feat3, 1,1, padding='VALID', activation_fn=None, scope='stage2/task1/fc4')
     pred_dof_score = tf.nn.sigmoid(pred_dof_score, name='stage2/task_1/score')
     pred_dof_score = tf.squeeze(pred_dof_score,axis = -1)
-    return pred_dof_score
+    return pred_dof_score, all_feat
 
 
 def get_stage_2_loss(pred_dof_score,dof_score_pl,dof_mask_pl):
