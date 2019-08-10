@@ -138,13 +138,13 @@ def train():
 
                 print "--- Get training operator"
                 # Get training operator
-                learning_rate = get_learning_rate(batch)
+                learning_rate = get_learning_rate(batch_stage_1)
                 tf.summary.scalar('learning_rate', learning_rate)
                 if OPTIMIZER == 'momentum':
                     optimizer = tf.train.MomentumOptimizer(learning_rate, momentum=MOMENTUM)
                 elif OPTIMIZER == 'adam':
                     optimizer = tf.train.AdamOptimizer(learning_rate)
-                train_op = optimizer.minimize(loss, global_step=batch)
+                train_op = optimizer.minimize(loss, global_step=batch_stage_1)
             
                 # Add ops to save and restore all the variables.
                 saver = tf.train.Saver(max_to_keep=100)
