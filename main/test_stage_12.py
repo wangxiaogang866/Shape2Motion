@@ -469,7 +469,7 @@ def eval_one_epoch_stage_2(sess, ops, train_writer):
            % (datetime.now(),step,total_loss,process_duration,examples_per_sec,sec_per_batch))
         temp_name = dataset[i]
         temp_name = temp_name[34:-4]
-        sio.savemat('test_s_2_pred_'+temp_name, {'pred_dof_score_val': pred_dof_score_val,'all_feat':all_feat})
+        sio.savemat('train_stage_1_result/test_s_2_pred_'+temp_name, {'pred_dof_score_val': pred_dof_score_val,'all_feat':all_feat})
 
 
 if __name__ == "__main__":

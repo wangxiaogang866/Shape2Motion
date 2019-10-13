@@ -1,0 +1,7 @@
+train_data/
+test_data/
+stage_1_log/
+stage_2_log/
+train_stage_1_result/
+train_stage_2_all/
+
