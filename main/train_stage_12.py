@@ -386,16 +386,16 @@ def train_one_epoch_stage_1(sess, ops, train_writer):
 
 def train_one_epoch_stage_2(sess, ops, train_writer):
     is_training = True
-    permutation = np.random.permutation(328)
+    permutation = np.random.permutation(37)
     for i in range(len(permutation)/4):
         load_data_start_time = time.time();
-        loadpath = './train_data_stage_2/train_stage_2_data_'+str(permutation[i*4]+1)+'.mat'
+        loadpath = './train_data_stage_2_all/train_stage_2_data_'+str(permutation[i*4]+1)+'.mat'
         train_data = sio.loadmat(loadpath)['Training_data']
         load_data_duration = time.time() - load_data_start_time
         log_string('\t%s: %s load time: %f' % (datetime.now(),loadpath,load_data_duration))
         for j in range(3):
             temp_load_data_start_time = time.time();
-            temp_loadpath = './train_data_stage_2/train_stage_2_data_'+str(permutation[i*4+j+1]+1)+'.mat'
+            temp_loadpath = './train_data_stage_2_all/train_stage_2_data_'+str(permutation[i*4+j+1]+1)+'.mat'
             temp_train_data = sio.loadmat(temp_loadpath)['Training_data']
             temp_load_data_duration = time.time() - temp_load_data_start_time
             log_string('\t%s: %s load time: %f' % (datetime.now(),temp_loadpath,temp_load_data_duration))
