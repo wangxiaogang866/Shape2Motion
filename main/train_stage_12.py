@@ -386,7 +386,7 @@ def train_one_epoch_stage_1(sess, ops, train_writer):
 
 def train_one_epoch_stage_2(sess, ops, train_writer):
     is_training = True
-    permutation = np.random.permutation(37)
+    permutation = np.random.permutation(101)
     for i in range(len(permutation)/4):
         load_data_start_time = time.time();
         loadpath = './train_data_stage_2/train_stage_2_data_'+str(permutation[i*4]+1)+'.mat'
