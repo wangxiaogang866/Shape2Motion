@@ -43,7 +43,7 @@ for k = 1:37
         end    
     end
     save_path = ['train_data_stage_2_all/train_stage_2_all_',temp_name,'.mat'];
-    save(save_path,'all_Training_data','-v7.3');
+    save(save_path,'all_Training_data','-v7');
 end
 end
 function Training_data = solve(model_pred,pred_simmat,pred_labels_key_p_val,pred_labels_direction_val,pred_regression_direction_val,pred_regression_position_val,pred_labels_type_val)
