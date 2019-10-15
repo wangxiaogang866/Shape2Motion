@@ -2,7 +2,7 @@ function generate_stage_3_data_Simu
 FindFiles = 'train_data_stage_2/';
 Files = dir(fullfile(FindFiles,'*.mat'));
 filenames = {Files.name}';
-for i = 111:size(filenames,1)
+for i = 1:size(filenames,1)
 tic;
 temp_name = filenames{i};
 load_path = [FindFiles temp_name];
