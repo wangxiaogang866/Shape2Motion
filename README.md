@@ -12,7 +12,11 @@ Created by Xiaogang Wang, Bin Zhou, Yahao Shi, Xiaowu Chen, Qinping Zhao, Kai Xu
      
 ## Dataset 
 [June 13, 2019] We release our 3D object mobility dataset 'Motion Dataset V0' [here](https://pan.baidu.com/s/15SI47xGKfKBzFMLna_SOZg).
-Secret: wyqf
+
+Download link for outside China [here](https://drive.google.com/file/d/1ZtWgMqYSNl1MSXKaTnMdN6xHXme9AjXb/view?usp=sharing).
+Download link for China mainland [here](https://pan.baidu.com/s/15SI47xGKfKBzFMLna_SOZg).
+password: wyqf
+
 
 You can download the data (point cloud data) [here](http://www.zbuaa.com/CVPR19/dataset.zip) for training and testing.
 
