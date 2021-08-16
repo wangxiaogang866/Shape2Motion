@@ -11,9 +11,10 @@ Created by Xiaogang Wang, Bin Zhou, Yahao Shi, Xiaowu Chen, Qinping Zhao, Kai Xu
     scipy (ver. 0.19.1)
      
 ## Dataset 
-[June 13, 2019] We release our 3D object mobility dataset 'Motion Dataset V0' [here](https://pan.baidu.com/s/15SI47xGKfKBzFMLna_SOZg).
+[June 13, 2019] We release our 3D object mobility dataset 'Motion Dataset V0'.
 
 Download link for outside China [here](https://drive.google.com/file/d/1ZtWgMqYSNl1MSXKaTnMdN6xHXme9AjXb/view?usp=sharing).
+
 Download link for China mainland [here](https://pan.baidu.com/s/15SI47xGKfKBzFMLna_SOZg).
 password: wyqf
 
