@@ -138,13 +138,13 @@ def train():
 
                 print "--- Get training operator"
                 # Get training operator
-                learning_rate = get_learning_rate(batch)
+                learning_rate = get_learning_rate(batch_stage_1)
                 tf.summary.scalar('learning_rate', learning_rate)
                 if OPTIMIZER == 'momentum':
                     optimizer = tf.train.MomentumOptimizer(learning_rate, momentum=MOMENTUM)
                 elif OPTIMIZER == 'adam':
                     optimizer = tf.train.AdamOptimizer(learning_rate)
-                train_op = optimizer.minimize(loss, global_step=batch)
+                train_op = optimizer.minimize(loss, global_step=batch_stage_1)
             
                 # Add ops to save and restore all the variables.
                 saver = tf.train.Saver(max_to_keep=100)
@@ -412,7 +412,7 @@ def eval_one_epoch_stage_1(sess, ops, train_writer):
         pred_simmat_val = (pred_simmat_val<=255)*pred_simmat_val+(pred_simmat_val>255)*255
         temp_name = dataset[i]
         temp_name = temp_name[22:-4]
-        sio.savemat('test_pred_'+temp_name, {'pred_labels_key_p_val': pred_labels_key_p_val, \
+        sio.savemat('train_stage_1_result/test_pred_'+temp_name, {'pred_labels_key_p_val': pred_labels_key_p_val, \
                                                     'pred_labels_direction_val': pred_labels_direction_val, \
                                                     'pred_regression_direction_val': pred_regression_direction_val,\
                                                     'pred_regression_position_val': pred_regression_position_val, \
@@ -469,7 +469,7 @@ def eval_one_epoch_stage_2(sess, ops, train_writer):
            % (datetime.now(),step,total_loss,process_duration,examples_per_sec,sec_per_batch))
         temp_name = dataset[i]
         temp_name = temp_name[34:-4]
-        sio.savemat('test_s_2_pred_'+temp_name, {'pred_dof_score_val': pred_dof_score_val,'all_feat':all_feat})
+        sio.savemat('train_stage_2_result/test_s_2_pred_'+temp_name, {'pred_dof_score_val': pred_dof_score_val,'all_feat':all_feat})
 
 
 if __name__ == "__main__":
