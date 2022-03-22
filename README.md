@@ -19,7 +19,8 @@ Download link for China mainland [here](https://pan.baidu.com/s/15SI47xGKfKBzFML
 password: wyqf
 
 
-You can download the data (point cloud data) [here](http://www.zbuaa.com/CVPR19/dataset.zip) for training and testing.
+You can download the data (point cloud data) [here](https://pan.baidu.com/s/17HrrxGdM7B5A0CtT9kvzMw) for training and testing.
+password: ihlv
 
 
 ## Train：
